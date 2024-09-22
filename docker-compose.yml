@@ -1,4 +1,4 @@
-version: '3.8'
+version: '3.3'
 
 services:
   db:
@@ -6,8 +6,6 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: 1111
       MYSQL_DATABASE: db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: 1111
     ports:
       - "3306:3306"
 
@@ -17,12 +15,12 @@ services:
       - "8080:80"
     environment:
       PMA_HOST: db
-      PMA_USER: user
-      PMA_PASSWORD: userpassword
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
 
   flask:
     build: ./flask_app  # Path to your Flask app directory
     ports:
-      - "3001:5000"
+      - "3001:3000"
     depends_on:
       - db
