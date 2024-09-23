@@ -34,17 +34,17 @@ def index():
 @app.route('/create', methods=['GET', 'POST'])
 def create_comment():
     if request.method == 'POST':
+        user_id = request.form['id']
         content = request.form['content']
-        user_id = request.form['user_id']
-
-        if not content or not user_id:
-            flash('Content and User ID are required!')
+    
+        if not content:
+            flash('Content required!')
             return redirect(url_for('create_comment'))
 
         try:
             connection = get_db_connection()
             cursor = connection.cursor()
-            cursor.execute("INSERT INTO comment (content, user_id) VALUES (%s, %s)", (content, user_id))
+            cursor.execute("INSERT INTO comment (content) VALUES (%s, %s)", (content, user_id))
             connection.commit()
             flash('Comment created successfully!')
             return redirect(url_for('index'))
