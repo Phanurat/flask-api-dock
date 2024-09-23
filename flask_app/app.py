@@ -9,7 +9,7 @@ logging.basicConfig(level=logging.ERROR)
 
 def get_db_connection():
     return mysql.connector.connect(
-        host='db',
+        host='db',  # เปลี่ยนถ้าจำเป็น
         user='root',
         password='1111',
         database='db'
