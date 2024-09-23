@@ -23,7 +23,7 @@ services:
   flask:
     build: ./flask_app  # Path to your Flask app directory
     ports:
-      - "3001:5000"  # แก้ไขพอร์ตให้ตรงกับที่ Flask ใช้
+      - "3001:3000"  # แก้ไขพอร์ตให้ตรงกับที่ Flask ใช้
     depends_on:
       - db
 
