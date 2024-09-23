@@ -15,8 +15,6 @@ def get_db_connection():
 # หน้าแรก - แสดงรายการ comment ทั้งหมด (Read)
 @app.route('/')
 def index():
-    cursor = None
-    connection = None
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
@@ -41,8 +39,6 @@ def create_comment():
         if not content or not user_id:
             return redirect(url_for('create_comment'))
 
-        cursor = None
-        connection = None
         try:
             connection = get_db_connection()
             cursor = connection.cursor()
@@ -61,8 +57,6 @@ def create_comment():
 # แก้ไข comment (Update)
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit_comment(id):
-    cursor = None
-    connection = None
     try:
         connection = get_db_connection()
         cursor = connection.cursor(dictionary=True)
@@ -90,8 +84,6 @@ def edit_comment(id):
 # ลบ comment (Delete)
 @app.route('/delete/<int:id>', methods=['POST'])
 def delete_comment(id):
-    cursor = None
-    connection = None
     try:
         connection = get_db_connection()
         cursor = connection.cursor()
@@ -107,4 +99,4 @@ def delete_comment(id):
             connection.close()
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0')  # เปิดให้เข้าถึงจากทุกที่
+    app.run(debug=True)

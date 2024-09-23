@@ -2,19 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Comment List</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments</title>
 </head>
 <body>
-    <h1>Comment List</h1>
-    <a href="{{ url_for('create_comment') }}">Create New Comment</a>
+    <h1>Comments</h1>
+    <a href="{{ url_for('create_comment') }}">Create Comment</a>
     <ul>
         {% for comment in comments %}
             <li>
                 {{ comment.content }} (User ID: {{ comment.user_id }})
-                <a href="{{ url_for('edit_comment', id=comment.id) }}">Edit</a>
-                <form action="{{ url_for('delete_comment', id=comment.id) }}" method="POST" style="display:inline;">
+                <form action="{{ url_for('delete_comment', id=comment.id) }}" method="POST">
                     <button type="submit">Delete</button>
                 </form>
+                <a href="{{ url_for('edit_comment', id=comment.id) }}">Edit</a>
             </li>
         {% endfor %}
     </ul>
