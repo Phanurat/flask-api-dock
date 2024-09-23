@@ -8,8 +8,6 @@ services:
       MYSQL_DATABASE: db
     ports:
       - "3306:3306"
-    volumes:
-      - db_data:/var/lib/mysql  # ใช้ volume เพื่อเก็บข้อมูล
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin

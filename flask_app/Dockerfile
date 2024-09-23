@@ -1,15 +1,15 @@
-# ใช้ Python เป็น Base Image
-FROM python:3.9
+# Use a lightweight version of Python
+FROM python:3.9-slim
 
-# กำหนด working directory
+# Set the working directory
 WORKDIR /app
 
-# คัดลอก requirements.txt และติดตั้ง dependencies
-COPY requirements.txt .
+# Copy requirements file and install dependencies
+COPY requirements.txt requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# คัดลอกโค้ด Flask app
+# Copy the rest of the application code
 COPY . .
 
-# กำหนดคำสั่งรัน
-CMD ["python", "app.py"]
+# Run the Flask application
+CMD ["flask", "run", "--host=0.0.0.0"]
