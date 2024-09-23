@@ -1,15 +1,12 @@
 from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
-import logging
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'  # ใช้คีย์ที่ปลอดภัย
-
-logging.basicConfig(level=logging.ERROR)
+app.secret_key = 'your_secret_key'  # สำหรับ flash message
 
 def get_db_connection():
     return mysql.connector.connect(
-        host='db',  # เปลี่ยนถ้าจำเป็น
+        host='db',
         user='root',
         password='1111',
         database='db'
@@ -24,9 +21,7 @@ def index():
             comments = cursor.fetchall()
         return render_template('index.html', comments=comments)
     except Exception as e:
-        logging.error(f"Error occurred: {str(e)}")
-        flash('An error occurred while fetching comments. Please try again.')
-        return redirect(url_for('index'))
+        return str(e)
 
 @app.route('/create', methods=['GET', 'POST'])
 def create_comment():
@@ -44,8 +39,7 @@ def create_comment():
             flash('Comment created successfully!')
             return redirect(url_for('index'))
         except Exception as e:
-            logging.error(f"Error occurred: {str(e)}")
-            flash('An error occurred while creating the comment. Please try again.')
+            flash(str(e))
             return redirect(url_for('create_comment'))
 
     return render_template('create.html')
@@ -73,8 +67,7 @@ def edit_comment(id):
 
         return render_template('edit.html', comment=comment)
     except Exception as e:
-        logging.error(f"Error occurred: {str(e)}")
-        flash('An error occurred while editing the comment. Please try again.')
+        flash(str(e))
         return redirect(url_for('index'))
 
 @app.route('/delete/<int:id>', methods=['POST'])
@@ -87,8 +80,7 @@ def delete_comment(id):
         flash('Comment deleted successfully!')
         return redirect(url_for('index'))
     except Exception as e:
-        logging.error(f"Error occurred: {str(e)}")
-        flash('An error occurred while deleting the comment. Please try again.')
+        flash(str(e))
         return redirect(url_for('index'))
 
 if __name__ == '__main__':
