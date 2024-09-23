@@ -1,7 +1,8 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import mysql.connector
 
 app = Flask(__name__)
+#app.secret_key = 'your_secret_key'  # สำหรับ flash message
 
 # ฟังก์ชันสำหรับเชื่อมต่อกับฐานข้อมูล
 def get_db_connection():
@@ -37,6 +38,7 @@ def create_comment():
         user_id = request.form['user_id']
 
         if not content or not user_id:
+            flash('Content and User ID are required!')
             return redirect(url_for('create_comment'))
 
         try:
@@ -44,9 +46,11 @@ def create_comment():
             cursor = connection.cursor()
             cursor.execute("INSERT INTO comment (content, user_id) VALUES (%s, %s)", (content, user_id))
             connection.commit()
+            flash('Comment created successfully!')
             return redirect(url_for('index'))
         except Exception as e:
-            return str(e)
+            flash(str(e))
+            return redirect(url_for('create_comment'))
         finally:
             if cursor:
                 cursor.close()
@@ -66,15 +70,18 @@ def edit_comment(id):
         if request.method == 'POST':
             new_content = request.form['content']
             if not new_content:
+                flash('Content is required!')
                 return redirect(url_for('edit_comment', id=id))
 
             cursor.execute("UPDATE comment SET content = %s WHERE id = %s", (new_content, id))
             connection.commit()
+            flash('Comment updated successfully!')
             return redirect(url_for('index'))
 
         return render_template('edit.html', comment=comment)
     except Exception as e:
-        return str(e)
+        flash(str(e))
+        return redirect(url_for('index'))
     finally:
         if cursor:
             cursor.close()
@@ -89,9 +96,11 @@ def delete_comment(id):
         cursor = connection.cursor()
         cursor.execute("DELETE FROM comment WHERE id = %s", (id,))
         connection.commit()
+        flash('Comment deleted successfully!')
         return redirect(url_for('index'))
     except Exception as e:
-        return str(e)
+        flash(str(e))
+        return redirect(url_for('index'))
     finally:
         if cursor:
             cursor.close()
@@ -99,5 +108,4 @@ def delete_comment(id):
             connection.close()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
-
+    app.run(debug=True)
