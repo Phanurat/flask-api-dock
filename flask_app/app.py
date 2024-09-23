@@ -23,6 +23,17 @@ def index():
     except Exception as e:
         return str(e)
 
+@app.route('/api/comments', methods=['GET'])
+def show_comments():
+    try:
+        with get_db_connection() as connection:
+            cursor = connection.cursor(dictionary=True)
+            cursor.execute("SELECT * FROM comment;")
+            comments = cursor.fetchall()
+        return jsonify(comments)  # ส่งกลับข้อมูลในรูปแบบ JSON
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/create', methods=['GET', 'POST'])
 def create_comment():
     if request.method == 'POST':
