@@ -8,6 +8,8 @@ services:
       MYSQL_DATABASE: db
     ports:
       - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql  # ใช้ volume เพื่อเก็บข้อมูล
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -24,3 +26,6 @@ services:
       - "3001:5000"  # แก้ไขพอร์ตให้ตรงกับที่ Flask ใช้
     depends_on:
       - db
+
+volumes:
+  db_data:  # กำหนด volume ที่จะใช้เก็บข้อมูลของฐานข้อมูล
