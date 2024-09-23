@@ -44,5 +44,21 @@ def get_comments():
         if connection:
             connection.close()
 
+@app.route('/api/cookies', methods=['GET'])
+def get_cookies():
+    try:
+        connection = get_db_connection()
+        cursor = connection.cursor(dictionary=True)
+        cursor.execute("SELECT * FROM cookies;")  # เรียกข้อมูลจากตาราง comment
+        cookies = cursor.fetchall()
+        return jsonify(cookies)
+    except Exception as e:
+        return jsonify({'error': str(e)})
+    finally:
+        if cursor:
+            cursor.close()
+        if connection:
+            connection.close()
+
 if __name__ == '__main__':
     app.run(debug=True)
