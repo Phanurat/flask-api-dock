@@ -3,12 +3,10 @@
 {% block content %}
     <h2>Add New Comment</h2>
     <form method="POST">
+        <label for="user_id">User ID:</label>
+        <input type="number" name="id" id="id" required>
         <label for="content">Content:</label>
         <input type="text" name="content" id="content" required>
-        
-        <label for="user_id">User ID:</label>
-        <input type="number" name="user_id" id="user_id" required>
-        
         <button type="submit">Create</button>
     </form>
 {% endblock %}
