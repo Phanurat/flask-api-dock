@@ -1,5 +1,9 @@
-from fastapi import FastAPI, Depends,HTTPException
+import csv
+import io
+from fastapi import FastAPI, Depends, File,HTTPException, UploadFile
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
+import crud
 from database import SessionLocal, engine
 import models
 
@@ -64,7 +68,7 @@ def update_content(content_id: int, content_update: str, db: Session = Depends(g
     db.refresh(db_comment)
     return db_comment
 
-@app.delete("/delete/content/{user_id}")
+@app.delete("/delete/content/{content_id}")
 def delete_content(content_id: int, db: Session = Depends(get_db)):
     db_comment = db.query(models.Content).filter(models.Content.id == content_id).first()
     
@@ -76,6 +80,39 @@ def delete_content(content_id: int, db: Session = Depends(get_db)):
     
     return {"detail": "Content deleted successfully"}
 
+
+@app.get("/contents/export")
+async def export_contents(db: Session = Depends(get_db)):
+    
+    contents = db.query(models.Content).all()
+    buffer = io.StringIO()
+    writer = csv.writer(buffer)
+    writer.writerow(["id", "content"])
+
+    for conts in contents:
+        writer.writerow([conts.id, conts.content])
+
+    buffer.seek(0)
+
+    return StreamingResponse(buffer, media_type="text/csv", headers={
+        "Content-Disposition": "attachment; filename=contents.csv"
+    })
+
+@app.post("/contents/import")
+async def update_contents_from_csv(file: UploadFile = File(...), db: Session = Depends(get_db)):
+
+    if file.content_type != 'text/csv':
+        raise HTTPException(status_code=400, detail="Invalid file format. Please upload a CSV file.")
+
+    contents = await file.read()
+    csv_reader = csv.reader(io.StringIO(contents.decode("utf-8")))
+
+    # remove header
+    header = next(csv_reader)
+
+    updated_contents = crud.import_contents(db, csv_reader)
+
+    return {"detail": "updated successfully", "updated_data": updated_contents}
 
 
 
