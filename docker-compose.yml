@@ -9,7 +9,7 @@ services:
     ports:
       - "3306:3306"
     volumes:
-      - db_data:/var/lib/mysql  # กำหนด volume เพื่อเก็บข้อมูล
+      - db_data:/var/lib/mysql
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -18,18 +18,18 @@ services:
     environment:
       PMA_HOST: db
       PMA_USER: root
-      PMA_PASSWORD: 1111  # เปลี่ยนรหัสผ่านให้ตรงกัน
+      PMA_PASSWORD: 1111
 
   flask:
     build: ./flask_app  # Path to your Flask app directory
     ports:
-      - "3001:5000"  # แก้ไขพอร์ตให้ตรงกับที่ Flask ใช้
+      - "3001:8000"  # แก้ไขพอร์ตให้ตรงกันกับ Dockerfile
     depends_on:
       - db
     environment:
-      FLASK_ENV: development  # ตั้งค่าระดับการพัฒนา
-      FLASK_APP: main:app      # ตั้งค่าชื่อแอป Flask ที่ต้องการรัน
-      DATABASE_URL: mysql+mysqlconnector://root:1111@db/db  # ตั้งค่าการเชื่อมต่อฐานข้อมูล
+      FLASK_ENV: development
+      FLASK_APP: main:app
+      DATABASE_URL: mysql+mysqlconnector://root:1111@db/db
 
 volumes:
-  db_data:  # กำหนด volume ที่จะใช้เก็บข้อมูลของฐานข้อมูล
+  db_data:
