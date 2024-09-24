@@ -1,2 +1,5 @@
 Flask
 mysql-connector-python
+uvicorn
+sqlalchemy
+fastapi[all]
