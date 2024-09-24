@@ -6,9 +6,9 @@ app.secret_key = 'your_secret_key'  # สำหรับ flash message
 
 def get_db_connection():
     return mysql.connector.connect(
-        host='db',
+        host='localhost',
         user='root',
-        password='1111',
+        password='',
         database='db'
     )
 
