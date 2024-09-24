@@ -26,6 +26,10 @@ services:
       - "3001:5000"  # แก้ไขพอร์ตให้ตรงกับที่ Flask ใช้
     depends_on:
       - db
-      
+    environment:
+      FLASK_ENV: development  # ตั้งค่าระดับการพัฒนา
+      FLASK_APP: main:app      # ตั้งค่าชื่อแอป Flask ที่ต้องการรัน
+      DATABASE_URL: mysql+mysqlconnector://root:1111@db/db  # ตั้งค่าการเชื่อมต่อฐานข้อมูล
+
 volumes:
   db_data:  # กำหนด volume ที่จะใช้เก็บข้อมูลของฐานข้อมูล
