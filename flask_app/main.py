@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends,HTTPException
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
 import models
@@ -27,7 +27,7 @@ app.add_middleware(
 
 @app.get("/")
 def read_root():
-    return {"Hello": "World"}
+    return {"iron": "v.1"}
 
 def get_db():
     db = SessionLocal()
@@ -35,6 +35,15 @@ def get_db():
         yield db
     finally:
         db.close()
+
+@app.get("/content/")
+def read_all_content(db: Session = Depends(get_db)):
+    contents = db.query(models.Content).all()
+    return contents
+
+@app.get("/content/{content_id}")
+def read_content(content_id: int, db: Session = Depends(get_db)):
+    return db.query(models.Content).filter(models.Content.id == content_id).first()
 
 @app.post("/content/")
 def create_content(content: str, db: Session = Depends(get_db)):
@@ -44,9 +53,29 @@ def create_content(content: str, db: Session = Depends(get_db)):
     db.refresh(db_comment)
     return db_comment
 
-@app.get("/content/{content_id}")
-def read_content(content_id: int, db: Session = Depends(get_db)):
-    return db.query(models.Content).filter(models.Content.id == content_id).first()
+@app.put("/update/content/{content_id}")
+def update_content(content_id: int, content_update: str, db: Session = Depends(get_db)):
+    db_comment = db.query(models.Content).filter(models.Content.id == content_id).first()
+    
+    if not db_comment:
+        raise HTTPException(status_code=404, detail="Content not found")
+    db_comment.content = content_update
+    db.commit()
+    db.refresh(db_comment)
+    return db_comment
+
+@app.delete("/delete/content/{user_id}")
+def delete_content(content_id: int, db: Session = Depends(get_db)):
+    db_comment = db.query(models.Content).filter(models.Content.id == content_id).first()
+    
+    if not db_comment:
+        raise HTTPException(status_code=404, detail="Content not found")
+    
+    db.delete(db_comment)
+    db.commit()
+    
+    return {"detail": "Content deleted successfully"}
+
 
 
 
