@@ -1,9 +1,7 @@
-import csv
-import io
+import crud, models, schemas, csv, io
 from fastapi import FastAPI, Depends, File,HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-import crud, models, schemas
 from database import SessionLocal, engine
 
 from fastapi.middleware.cors import CORSMiddleware
