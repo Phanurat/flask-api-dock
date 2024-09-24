@@ -3,12 +3,10 @@ import io
 from fastapi import FastAPI, Depends, File,HTTPException, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
-import crud
+import crud, models, schemas
 from database import SessionLocal, engine
-import models
 
 from fastapi.middleware.cors import CORSMiddleware
-
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -29,10 +27,6 @@ app.add_middleware(
 )
 
 
-@app.get("/")
-def read_root():
-    return {"iron": "v.1"}
-
 def get_db():
     db = SessionLocal()
     try:
@@ -40,45 +34,48 @@ def get_db():
     finally:
         db.close()
 
-@app.get("/content/")
-def read_all_content(db: Session = Depends(get_db)):
-    contents = db.query(models.Content).all()
+@app.get("/")
+def read_root():
+    return {"iron": "v.1"}
+
+@app.get("/content", response_model=list[schemas.Contents])
+def read_all_content(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    contents = crud.get_all_contents(db, skip=skip, limit=limit)
     return contents
 
-@app.get("/content/{content_id}")
+@app.get("/content/{content_id}", response_model=schemas.Contents)
 def read_content(content_id: int, db: Session = Depends(get_db)):
-    return db.query(models.Content).filter(models.Content.id == content_id).first()
-
-@app.post("/content/")
-def create_content(content: str, db: Session = Depends(get_db)):
-    db_comment = models.Content(content=content)
-    db.add(db_comment)
-    db.commit()
-    db.refresh(db_comment)
-    return db_comment
-
-@app.put("/update/content/{content_id}")
-def update_content(content_id: int, content_update: str, db: Session = Depends(get_db)):
-    db_comment = db.query(models.Content).filter(models.Content.id == content_id).first()
-    
-    if not db_comment:
+    db_content= crud.get_content(db=db, content_id=content_id)
+    if not db_content:
         raise HTTPException(status_code=404, detail="Content not found")
-    db_comment.content = content_update
-    db.commit()
-    db.refresh(db_comment)
-    return db_comment
+    return db_content
 
-@app.delete("/delete/content/{content_id}")
+
+@app.post("/content", response_model=schemas.Contents)
+def create_content(contents: schemas.ContentCreate, db: Session = Depends(get_db)):
+    # ตรวจสอบว่ามีการส่ง Content มาหรือไม่
+    if not contents.content:
+        raise HTTPException(status_code=400, detail="Contents are required")
+
+    return crud.create_content(db=db, contentSche=contents)
+
+
+@app.put("/update/content/{content_id}", response_model=schemas.Contents)
+def content_update(content_id: int, content_update: schemas.ContentUpdate, db: Session = Depends(get_db)):
+    if not content_update.content:
+        raise HTTPException(status_code=400, detail="content are required")
+
+    db_content = crud.update_content(db=db, content_id=content_id, content_update=content_update)
+    if not db_content:
+        raise HTTPException(status_code=404, detail="Content not found")
+    return db_content
+
+@app.delete("/delete/content/{content_id}", response_model=schemas.Contents)
 def delete_content(content_id: int, db: Session = Depends(get_db)):
-    db_comment = db.query(models.Content).filter(models.Content.id == content_id).first()
-    
-    if not db_comment:
+    db_content = crud.delete_content(db=db, content_id=content_id)
+    if not db_content:
         raise HTTPException(status_code=404, detail="Content not found")
-    
-    db.delete(db_comment)
-    db.commit()
-    
-    return {"detail": "Content deleted successfully"}
+    return db_content
 
 
 @app.get("/contents/export")
