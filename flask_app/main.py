@@ -1,5 +1,5 @@
 import crud, models, schemas, csv, io
-from fastapi import FastAPI, Depends, File,HTTPException, UploadFile
+from fastapi import FastAPI, Depends, File,HTTPException, Response, UploadFile
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 from database import SessionLocal, engine
@@ -13,7 +13,7 @@ app = FastAPI()
 
 origins = [
     "http://localhost:3000",
-    'http://127.0.0.1:3000'
+    "http://127.0.0.1:3000"
 ]
 
 app.add_middleware(
@@ -68,12 +68,12 @@ def content_update(content_id: int, content_update: schemas.ContentUpdate, db: S
         raise HTTPException(status_code=404, detail="Content not found")
     return db_content
 
-@app.delete("/delete/content/{content_id}", response_model=schemas.Contents)
+@app.delete("/delete/content/{content_id}", status_code=204)
 def delete_content(content_id: int, db: Session = Depends(get_db)):
     db_content = crud.delete_content(db=db, content_id=content_id)
     if not db_content:
         raise HTTPException(status_code=404, detail="Content not found")
-    return db_content
+    return Response(status_code=204)  # No content to return
 
 
 @app.get("/contents/export")

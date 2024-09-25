@@ -1,4 +1,5 @@
 from typing import List
+from fastapi import HTTPException
 from requests import Session
 import models, schemas
 
@@ -34,11 +35,12 @@ def update_content(db: Session, content_id: int, content_update: schemas.Content
 
 def delete_content(db: Session, content_id: int):
     db_content = db.query(models.Content).filter(models.Content.id == content_id).first()
-    if db_content:
-        db.delete(db_content)
-        db.commit()
-        db.refresh(db_content)
-    return db_content
+    if not db_content:
+        raise HTTPException(status_code=404, detail="Content not found")
+
+    db.delete(db_content)
+    db.commit()
+    return db_content  
 
 
 def import_contents(db: Session, contents: List[schemas.ContentCreate]): 
