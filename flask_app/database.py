@@ -3,7 +3,11 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
 # Database URL
-DATABASE_URL = "mysql+mysqlconnector://root:1111@db/iron"
+# deploy
+# DATABASE_URL = "mysql+mysqlconnector://root:1111@db/iron"  
+
+# local
+DATABASE_URL = "mysql+mysqlconnector://root@localhost/iron"  
 
 # Create the SQLAlchemy engine
 engine = create_engine(DATABASE_URL)
